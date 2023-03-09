@@ -1,0 +1,24 @@
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  token VARCHAR NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS actions (
+  id SERIAL PRIMARY KEY,
+  action_type VARCHAR(50) NOT NULL,
+  action_name VARCHAR(255) NOT NULL,
+  action_description TEXT NOT NULL,
+  action_provider VARCHAR(50) NOT NULL,
+  user_id INTEGER DEFAULT NULL, 
+  CONSTRAINT fk_users FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS options (
+  id SERIAL PRIMARY KEY,
+  option_key VARCHAR(255) NOT NULL,
+  option_value VARCHAR(255) NOT NULL,
+  action_id INTEGER DEFAULT NULL, 
+  CONSTRAINT fk_actions FOREIGN KEY (action_id) REFERENCES actions(id)
+);
