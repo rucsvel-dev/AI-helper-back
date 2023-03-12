@@ -7,14 +7,14 @@ use crate::{
         app_error::AppError
     },
 };
-use axum::{extract::State, Json, Extension};
+use axum::{extract::State, Json, Extension, http::StatusCode};
 use sea_orm::{DatabaseConnection, Set};
 
 pub async fn create_action(
     Extension(user): Extension<users::Model>,
     State(db): State<DatabaseConnection>,
     Json(create_action_request): Json<RequestCreateAction>,
-) -> Result<Json<ResponseCreateAction>, AppError> {
+) -> Result<(StatusCode, Json<ResponseCreateAction>), AppError> {
     let mut new_action = actions::ActiveModel {
         ..Default::default()
     };
@@ -26,11 +26,11 @@ pub async fn create_action(
 
     let action = create_action_query(&db, new_action).await?;
 
-    Ok(Json(ResponseCreateAction {
+    Ok((StatusCode::CREATED, Json(ResponseCreateAction {
         id: action.id,
         name: action.action_name,
         description: action.action_description,
         provider: action.action_provider,
         action_type: action.action_type
-    }))
+    })))
 }
